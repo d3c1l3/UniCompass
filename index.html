@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniCompass | International Undergraduate University Explorer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            800: '#162844',
+                            900: '#0F1E36',
+                            950: '#091324',
+                        },
+                        teal: {
+                            50: '#F0FDFA',
+                            100: '#CCFBF1',
+                            500: '#14B8A6',
+                            600: '#0D9488',
+                            700: '#0F766E',
+                        },
+                        amber: {
+                            50: '#FFFBEB',
+                            100: '#FEF3C7',
+                            500: '#F59E0B',
+                            600: '#D97706',
+                            700: '#B45309',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #0D9488;
+            border: 3px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(15, 30, 54, 0.25);
+            cursor: pointer;
+            margin-top: -7px;
+            transition: transform 0.15s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #CBD5E1;
+            border-radius: 999px;
+        }
+        /* Custom Scrollbar for Modal & Comparison Table */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-teal-100 selection:text-teal-900">
+
+    <!-- Persistent Top Informational Disclaimer Banner -->
+    <div id="top-disclaimer" class="bg-amber-50 border-b border-amber-200 text-amber-950 px-4 py-2.5 text-xs sm:text-sm sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto flex items-start sm:items-center justify-between gap-3">
+            <div class="flex items-start sm:items-center gap-2.5">
+                <i data-lucide="info" class="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 shrink-0 mt-0.5 sm:mt-0"></i>
+                <p class="leading-snug">
+                    <span class="font-bold uppercase tracking-wider text-amber-800 text-[11px] bg-amber-200/80 px-1.5 py-0.5 rounded mr-1.5">Informational Resource Only</span>
+                    UniCompass provides comparative estimates for <strong class="font-semibold">undergraduate tuition, fees, accommodation, and funding</strong>. This platform is <strong class="underline decoration-amber-400">NOT</strong> an official admissions counseling, application agency, or visa advisory service. Always verify figures directly with each university.
+                </p>
+            </div>
+            <button onclick="openDisclaimerModal()" class="shrink-0 text-xs font-semibold text-amber-800 hover:text-amber-950 underline underline-offset-2 whitespace-nowrap py-1 px-2 rounded hover:bg-amber-100 transition">
+                Read Full Scope
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2.5 group">
+                <div class="w-9 h-9 rounded-xl bg-navy-900 text-white flex items-center justify-center shadow-sm group-hover:bg-teal-600 transition-colors">
+                    <i data-lucide="compass" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="font-display font-bold text-lg text-navy-900 tracking-tight block leading-none">UniCompass</span>
+                    <span class="text-[11px] font-medium text-slate-500 tracking-wide">Undergrad Research Portal</span>
+                </div>
+            </a>
+
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+                <a href="#explorer-section" class="hover:text-navy-900 transition">University Directory</a>
+                <a href="#comparison-section" class="hover:text-navy-900 transition flex items-center gap-1.5">
+                    Side-by-Side Compare
+                    <span id="nav-compare-badge" class="bg-teal-100 text-teal-800 text-xs font-bold px-2 py-0.5 rounded-full">0/3</span>
+                </a>
+                <a href="#estimator-section" class="hover:text-navy-900 transition">Cost Estimator</a>
+            </nav>
+
+            <div class="flex items-center gap-2">
+                <a href="#estimator-section" class="inline-flex items-center gap-1.5 bg-navy-900 hover:bg-navy-800 text-white text-xs sm:text-sm font-semibold px-3.5 py-2 rounded-xl transition shadow-sm">
+                    <i data-lucide="calculator" class="w-4 h-4 text-teal-400"></i>
+                    <span>Budget Calculator</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-navy-900 text-white relative overflow-hidden">
+        <!-- Subtle Decorative Background Grid & Glow -->
+        <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#94A3B8 1px, transparent 1px); background-size: 24px 24px;"></div>
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 relative z-10">
+            <div class="max-w-3xl mx-auto text-center">
+                <div class="inline-flex items-center gap-2 bg-navy-800/90 border border-slate-700 text-teal-300 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-5">
+                    <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                    <span>Early-Stage Research for Prospective International Undergraduates</span>
+                </div>
+                <h1 class="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight mb-4">
+                    Compare Global Undergraduate Costs, Funding & Housing
+                </h1>
+                <p class="text-slate-300 text-base sm:text-lg leading-relaxed mb-8 max-w-2xl mx-auto">
+                    Explore transparent estimates on international tuition fees, merit scholarships, dormitory rents, and bachelor's degree structures—without sales pitches or agency bias.
+                </p>
+
+                <!-- Search & Country Filter Bar -->
+                <div class="bg-white p-2 sm:p-2.5 rounded-2xl shadow-xl border border-slate-200/80 flex flex-col sm:flex-row gap-2 text-slate-800">
+                    <div class="relative flex-1 flex items-center">
+                        <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-3.5 pointer-events-none"></i>
+                        <input type="text" id="hero-search-input" placeholder="Search university, city, or bachelor's degree (e.g., Computer Science)..."
+                            class="w-full pl-11 pr-4 py-3 text-sm sm:text-base bg-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/40 text-slate-900 placeholder-slate-400">
+                    </div>
+                    <div class="h-px sm:h-auto sm:w-px bg-slate-200"></div>
+                    <div class="relative sm:w-52 flex items-center">
+                        <i data-lucide="globe" class="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none"></i>
+                        <select id="hero-country-select" aria-label="Filter by Country"
+                            class="w-full pl-10 pr-8 py-3 text-sm font-medium bg-slate-50 sm:bg-transparent hover:bg-slate-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/40 text-slate-800 cursor-pointer appearance-none">
+                            <option value="All">All Countries (6)</option>
+                            <option value="Germany">Germany</option>
+                            <option value="Canada">Canada</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Australia">Australia</option>
+                            <option value="USA">USA</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 pointer-events-none"></i>
+                    </div>
+                    <button onclick="scrollToExplorer()" class="bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm sm:text-base px-6 py-3 rounded-xl transition shadow-sm flex items-center justify-center gap-2 shrink-0">
+                        <span>Explore</span>
+                        <i data-lucide="arrow-down-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Quick Category Pills -->
+                <div class="mt-6 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+                    <span class="text-xs font-medium text-slate-400 mr-1">Quick jump & focus:</span>
+                    <button onclick="triggerQuickPill('tuition')" class="quick-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-navy-800 hover:bg-teal-600 text-slate-200 hover:text-white border border-slate-700 hover:border-teal-500 transition">
+                        <i data-lucide="banknote" class="w-3.5 h-3.5 text-teal-400"></i>
+                        <span>Tuition & Fees</span>
+                    </button>
+                    <button onclick="triggerQuickPill('funding')" class="quick-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-navy-800 hover:bg-teal-600 text-slate-200 hover:text-white border border-slate-700 hover:border-teal-500 transition">
+                        <i data-lucide="award" class="w-3.5 h-3.5 text-amber-400"></i>
+                        <span>Funding & Scholarships</span>
+                    </button>
+                    <button onclick="triggerQuickPill('accommodation')" class="quick-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-navy-800 hover:bg-teal-600 text-slate-200 hover:text-white border border-slate-700 hover:border-teal-500 transition">
+                        <i data-lucide="home" class="w-3.5 h-3.5 text-teal-400"></i>
+                        <span>Accommodation</span>
+                    </button>
+                    <button onclick="triggerQuickPill('degrees')" class="quick-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-navy-800 hover:bg-teal-600 text-slate-200 hover:text-white border border-slate-700 hover:border-teal-500 transition">
+                        <i data-lucide="book-open" class="w-3.5 h-3.5 text-amber-400"></i>
+                        <span>Undergrad Degrees</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-16">
+
+        <!-- SECTION 2: Interactive University Explorer Directory -->
+        <section id="explorer-section" class="scroll-mt-20">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-200 px-2.5 py-1 rounded-md">Global Directory</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 mt-2">Undergraduate University Explorer</h2>
+                    <p class="text-slate-600 text-sm sm:text-base mt-1">Filter public and research institutions by annual international tuition, funding access, and bachelor's discipline.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="results-count" class="text-sm font-semibold text-slate-700 bg-white border border-slate-200 px-3.5 py-2 rounded-xl shadow-sm">
+                        Showing 9 universities
+                    </span>
+                    <button onclick="resetFilters()" class="text-sm font-medium text-slate-600 hover:text-navy-900 bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Reset</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Control Panel -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <!-- Country Filter -->
+                    <div>
+                        <label for="filter-country" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Destination Country</label>
+                        <div class="relative">
+                            <select id="filter-country" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 appearance-none cursor-pointer">
+                                <option value="All">All Countries</option>
+                                <option value="Germany">Germany</option>
+                                <option value="Canada">Canada</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Netherlands">Netherlands</option>
+                                <option value="Australia">Australia</option>
+                                <option value="USA">USA</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <!-- Max Annual Tuition Slider -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="filter-tuition" class="text-xs font-bold uppercase tracking-wider text-slate-500">Max Tuition / Yr</label>
+                            <span id="tuition-slider-val" class="text-xs font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md">Up to $55,000</span>
+                        </div>
+                        <div class="pt-2">
+                            <input type="range" id="filter-tuition" min="2000" max="55000" step="1000" value="55000">
+                            <div class="flex justify-between text-[11px] text-slate-400 mt-1.5 font-medium">
+                                <span>$2k (Low/Admin)</span>
+                                <span>$28k</span>
+                                <span>$55k+</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Funding Availability Filter -->
+                    <div>
+                        <label for="filter-funding" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Funding Availability</label>
+                        <div class="relative">
+                            <select id="filter-funding" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 appearance-none cursor-pointer">
+                                <option value="All">Any Funding / Tuition Model</option>
+                                <option value="High">Extensive Merit & Need Aid</option>
+                                <option value="Moderate">Partial Merit Scholarships</option>
+                                <option value="Low-Tuition">Low Statutory Tuition / External Grants</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <!-- Degree Discipline Filter -->
+                    <div>
+                        <label for="filter-discipline" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Degree Discipline</label>
+                        <div class="relative">
+                            <select id="filter-discipline" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 appearance-none cursor-pointer">
+                                <option value="All">All Disciplines</option>
+                                <option value="Engineering & Tech">Engineering & Computer Science</option>
+                                <option value="Business & Economics">Business, Finance & Economics</option>
+                                <option value="Natural Sciences">Natural & Life Sciences</option>
+                                <option value="Arts & Humanities">Social Sciences, Arts & Humanities</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- University Cards Grid -->
+            <div id="university-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <!-- Empty State (Hidden by default) -->
+            <div id="empty-state" class="hidden bg-white rounded-2xl border border-slate-200 p-12 text-center">
+                <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mx-auto mb-3">
+                    <i data-lucide="search-x" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-display text-lg font-bold text-navy-900">No matching universities found</h3>
+                <p class="text-slate-500 text-sm max-w-md mx-auto mt-1 mb-4">Try increasing your maximum annual tuition slider or clearing your keyword search to see more institutions.</p>
+                <button onclick="resetFilters()" class="bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold px-4 py-2 rounded-xl transition">
+                    Reset All Filters
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Side-by-Side Comparison Tool -->
+        <section id="comparison-section" class="scroll-mt-20">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-6 sm:p-8 border-b border-slate-200 bg-slate-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-navy-900 bg-amber-100 px-2.5 py-1 rounded-md mb-2">
+                            <i data-lucide="columns" class="w-3.5 h-3.5 text-amber-700"></i>
+                            <span>Comparison Matrix (Up to 3)</span>
+                        </div>
+                        <h2 class="font-display text-2xl font-bold text-navy-900">Side-by-Side University Comparison</h2>
+                        <p class="text-slate-600 text-sm mt-1">Select up to 3 universities from the directory above—or pick from the quick dropdowns below—to compare core undergraduate figures.</p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button onclick="clearComparison()" class="text-xs sm:text-sm font-semibold text-slate-600 hover:text-red-600 bg-white border border-slate-200 hover:border-red-200 px-3.5 py-2 rounded-xl transition">
+                            Clear Selection
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Add Selector Bar when fewer than 3 selected -->
+                <div id="compare-quick-add" class="px-6 sm:px-8 py-3.5 bg-teal-50/60 border-b border-teal-100 flex flex-wrap items-center justify-between gap-3">
+                    <span class="text-xs font-semibold text-teal-900 flex items-center gap-1.5">
+                        <i data-lucide="plus-circle" class="w-4 h-4 text-teal-600"></i>
+                        Quickly add an institution to compare:
+                    </span>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <select id="quick-compare-select" class="flex-1 sm:w-64 bg-white border border-teal-200 rounded-xl px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <option value="">Select a university...</option>
+                        </select>
+                        <button onclick="addFromQuickCompare()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-semibold px-3.5 py-1.5 rounded-xl transition shrink-0">
+                            Add
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Responsive Comparison Table Container -->
+                <div id="comparison-content" class="overflow-x-auto custom-scrollbar">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: Quick Cost & Budget Estimator -->
+        <section id="estimator-section" class="scroll-mt-20">
+            <div class="bg-navy-900 rounded-3xl text-white p-6 sm:p-10 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-80 h-80 bg-teal-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <!-- Controls Column -->
+                    <div class="lg:col-span-7 space-y-6">
+                        <div>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-teal-300 bg-navy-800 border border-slate-700 px-3 py-1 rounded-full">
+                                <i data-lucide="calculator" class="w-3.5 h-3.5"></i>
+                                <span>Interactive Planning Tool</span>
+                            </span>
+                            <h2 class="font-display text-2xl sm:text-3xl font-bold text-white mt-3">Annual International Student Cost Estimator</h2>
+                            <p class="text-slate-300 text-sm sm:text-base mt-1.5">
+                                Model a realistic 12-month undergraduate budget in USD by combining average tuition benchmarks, housing preferences, and daily living expenses.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Destination Country -->
+                            <div class="bg-navy-800/80 border border-slate-700/80 p-4 rounded-2xl">
+                                <label for="est-country" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">1. Destination Country</label>
+                                <select id="est-country" onchange="calculateBudget()" class="w-full bg-navy-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
+                                    <option value="Germany">Germany (Public Univ.)</option>
+                                    <option value="Netherlands">Netherlands (Non-EEA)</option>
+                                    <option value="United Kingdom">United Kingdom</option>
+                                    <option value="Canada">Canada</option>
+                                    <option value="Australia">Australia</option>
+                                    <option value="USA">USA (Public Out-of-State)</option>
+                                </select>
+                            </div>
+
+                            <!-- Housing Type -->
+                            <div class="bg-navy-800/80 border border-slate-700/80 p-4 rounded-2xl">
+                                <label for="est-housing" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">2. Accommodation Type</label>
+                                <select id="est-housing" onchange="calculateBudget()" class="w-full bg-navy-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer">
+                                    <option value="shared">Shared Off-Campus Flat</option>
+                                    <option value="oncampus">On-Campus Student Hall</option>
+                                    <option value="studio">Private Student Studio</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Lifestyle & Spending Tier -->
+                        <div class="bg-navy-800/80 border border-slate-700/80 p-4 rounded-2xl">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">3. Food, Transit & Personal Lifestyle</label>
+                            <div class="grid grid-cols-3 gap-2.5" id="lifestyle-selector">
+                                <button type="button" data-lifestyle="frugal" onclick="setLifestyle('frugal')" class="lifestyle-btn py-2.5 px-3 rounded-xl border text-left transition bg-navy-950 border-slate-700 text-slate-300 hover:border-slate-500">
+                                    <div class="text-xs sm:text-sm font-bold">Frugal</div>
+                                    <div class="text-[11px] text-slate-400 mt-0.5">Home cooking, student pass</div>
+                                </button>
+                                <button type="button" data-lifestyle="balanced" onclick="setLifestyle('balanced')" class="lifestyle-btn py-2.5 px-3 rounded-xl border text-left transition bg-teal-600/20 border-teal-500 text-white">
+                                    <div class="text-xs sm:text-sm font-bold">Balanced</div>
+                                    <div class="text-[11px] text-teal-200 mt-0.5">Moderate dining & books</div>
+                                </button>
+                                <button type="button" data-lifestyle="active" onclick="setLifestyle('active')" class="lifestyle-btn py-2.5 px-3 rounded-xl border text-left transition bg-navy-950 border-slate-700 text-slate-300 hover:border-slate-500">
+                                    <div class="text-xs sm:text-sm font-bold">Active</div>
+                                    <div class="text-[11px] text-slate-400 mt-0.5">Travel, gym & social life</div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Output Breakdown Card -->
+                    <div class="lg:col-span-5">
+                        <div class="bg-white text-slate-900 rounded-2xl p-6 sm:p-7 shadow-lg border border-slate-200">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Estimated Annual Total</span>
+                                    <div id="est-total-usd" class="font-display text-3xl sm:text-4xl font-extrabold text-navy-900 mt-0.5">$28,400 <span class="text-sm font-semibold text-slate-400">USD/yr</span></div>
+                                </div>
+                                <div class="w-11 h-11 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                                    <i data-lucide="wallet" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+
+                            <!-- Visual Stacked Bar -->
+                            <div class="my-5">
+                                <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex">
+                                    <div id="bar-tuition" class="bg-navy-900 h-full transition-all duration-300" style="width: 50%"></div>
+                                    <div id="bar-housing" class="bg-teal-500 h-full transition-all duration-300" style="width: 30%"></div>
+                                    <div id="bar-living" class="bg-amber-400 h-full transition-all duration-300" style="width: 20%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Line Item Breakdown -->
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-2 text-slate-600">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-navy-900"></span>
+                                        Avg. Tuition & Semester Fees
+                                    </span>
+                                    <span id="est-tuition-val" class="font-bold text-navy-900">$14,000</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-2 text-slate-600">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span>
+                                        Accommodation (12 mos.)
+                                    </span>
+                                    <span id="est-housing-val" class="font-bold text-navy-900">$9,600</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-2 text-slate-600">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                                        Food, Insurance & Living
+                                    </span>
+                                    <span id="est-living-val" class="font-bold text-navy-900">$4,800</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 pt-4 border-t border-slate-100 bg-slate-50 -mx-6 -mb-6 sm:-mx-7 sm:-mb-7 p-4 sm:px-7 rounded-b-2xl">
+                                <p id="est-country-note" class="text-xs text-slate-500 leading-relaxed">
+                                    *Note: Figures exclude one-time flight costs, visa application fees, and refundable security deposits.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer with Persistent Informational Disclaimer -->
+    <footer class="bg-navy-950 text-slate-300 border-t border-slate-800 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <!-- Prominent Footer Disclaimer Box -->
+            <div class="bg-navy-900 border border-slate-800 rounded-2xl p-5 sm:p-6 mb-10 flex flex-col sm:flex-row gap-4 items-start">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
+                    <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                </div>
+                <div class="space-y-1.5">
+                    <h3 class="font-display font-bold text-white text-sm sm:text-base">Important Research & Editorial Disclaimer</h3>
+                    <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                        UniCompass is an independent, educational directory built strictly to help prospective international students explore and compare high-level estimates of <strong class="text-slate-200">undergraduate tuition, mandatory semester fees, housing rents, degree durations, and scholarship pathways</strong>. We do <strong class="text-amber-300">not</strong> provide personalized admissions counseling, evaluate academic transcripts, guarantee scholarship eligibility, or offer legal/immigration visa advice. Tuition rates and exchange rates fluctuate annually—always confirm exact deadlines, prerequisite subjects, and financial proof requirements directly on each university's official admissions portal.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-navy-800 text-teal-400 flex items-center justify-center">
+                        <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <span class="font-semibold text-slate-300">UniCompass Undergraduate Explorer</span>
+                    <span>•</span>
+                    <span>Figures converted to approximate USD for comparison</span>
+                </div>
+                <div class="flex items-center gap-5">
+                    <a href="#explorer-section" class="hover:text-slate-300 transition">Directory</a>
+                    <a href="#comparison-section" class="hover:text-slate-300 transition">Compare Tool</a>
+                    <a href="#estimator-section" class="hover:text-slate-300 transition">Cost Estimator</a>
+                    <button onclick="openDisclaimerModal()" class="text-amber-400 hover:text-amber-300 transition">Scope & Limitations</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- DETAILED UNIVERSITY MODAL / DRAWER -->
+    <div id="university-modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-uni-title">
+        <!-- Backdrop -->
+        <div onclick="closeUniversityModal()" class="fixed inset-0 bg-navy-950/70 backdrop-blur-sm transition-opacity"></div>
+
+        <!-- Modal Panel -->
+        <div class="fixed inset-0 z-10 overflow-y-auto p-3 sm:p-6 flex items-center justify-center">
+            <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+                
+                <!-- Modal Header -->
+                <div class="bg-navy-900 text-white p-6 sm:p-7 relative shrink-0">
+                    <button onclick="closeUniversityModal()" aria-label="Close modal" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-navy-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span id="modal-country-badge" class="text-xs font-bold uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2.5 py-0.5 rounded-md">Country</span>
+                        <span id="modal-type-badge" class="text-xs font-medium text-slate-300 bg-navy-800 px-2.5 py-0.5 rounded-md">Public Research University</span>
+                    </div>
+                    <h2 id="modal-uni-title" class="font-display text-2xl sm:text-3xl font-bold text-white pr-10">University Name</h2>
+                    <p id="modal-uni-location" class="text-slate-300 text-sm mt-1 flex items-center gap-1.5">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-teal-400"></i>
+                        <span>City, Country</span>
+                    </p>
+
+                    <!-- Modal Navigation Tabs -->
+                    <div class="flex gap-1.5 sm:gap-2 mt-6 overflow-x-auto pb-1 custom-scrollbar" id="modal-tabs">
+                        <button onclick="switchModalTab('degrees')" data-tab="degrees" class="modal-tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap bg-white text-navy-900 shadow-sm">
+                            <i data-lucide="book-open" class="w-4 h-4 text-teal-600"></i>
+                            <span>Undergrad Degrees</span>
+                        </button>
+                        <button onclick="switchModalTab('tuition')" data-tab="tuition" class="modal-tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap bg-navy-800 text-slate-300 hover:text-white">
+                            <i data-lucide="banknote" class="w-4 h-4 text-teal-400"></i>
+                            <span>Tuition & Living Fees</span>
+                        </button>
+                        <button onclick="switchModalTab('funding')" data-tab="funding" class="modal-tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap bg-navy-800 text-slate-300 hover:text-white">
+                            <i data-lucide="award" class="w-4 h-4 text-amber-400"></i>
+                            <span>Funding & Scholarships</span>
+                        </button>
+                        <button onclick="switchModalTab('accommodation')" data-tab="accommodation" class="modal-tab-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap bg-navy-800 text-slate-300 hover:text-white">
+                            <i data-lucide="home" class="w-4 h-4 text-teal-400"></i>
+                            <span>Accommodation</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal Scrollable Tab Body -->
+                <div id="modal-body-content" class="p-6 sm:p-8 overflow-y-auto custom-scrollbar flex-1 bg-slate-50">
+                    <!-- Dynamic Tab Content Injected Here -->
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="bg-white border-t border-slate-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+                    <span class="text-xs text-slate-500 flex items-center gap-1.5">
+                        <i data-lucide="alert-circle" class="w-4 h-4 text-amber-500 shrink-0"></i>
+                        Informational summary only. Verify exact criteria on official university pages.
+                    </span>
+                    <div class="flex items-center gap-2.5 self-end sm:self-auto">
+                        <button id="modal-compare-btn" onclick="toggleCompareFromModal()" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-slate-300 hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Add to Compare</span>
+                        </button>
+                        <button onclick="closeUniversityModal()" class="bg-navy-900 hover:bg-navy-800 text-white px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">
+                            Done
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCOPE & DISCLAIMER MODAL -->
+    <div id="disclaimer-modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+        <div onclick="closeDisclaimerModal()" class="fixed inset-0 bg-navy-950/70 backdrop-blur-sm"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto p-4 flex items-center justify-center">
+            <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 p-6 sm:p-7">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                            <i data-lucide="info" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-display text-lg font-bold text-navy-900">About This Informational Portal</h3>
+                    </div>
+                    <button onclick="closeDisclaimerModal()" class="text-slate-400 hover:text-slate-700 p-1">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
+                    <p>
+                        <strong class="text-navy-900">What UniCompass Is:</strong> An early-stage comparative reference tool helping prospective undergraduate students understand how international tuition models, semester fees, student housing, and scholarships differ across major study destinations.
+                    </p>
+                    <p>
+                        <strong class="text-navy-900">What UniCompass Is NOT:</strong>
+                    </p>
+                    <ul class="list-disc pl-5 space-y-1.5 text-slate-600">
+                        <li>Not an admissions counseling agency or application submission service.</li>
+                        <li>Not an official representative of any university listed in the directory.</li>
+                        <li>Not a legal, financial, or immigration/student visa advisory service.</li>
+                    </ul>
+                    <p class="bg-amber-50 border border-amber-200 text-amber-900 p-3 rounded-xl text-xs">
+                        All monetary figures are rounded annual/monthly estimates converted to USD for side-by-side readability. Engineering, lab-intensive, and business degrees often carry differential tuition rates.
+                    </p>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="closeDisclaimerModal()" class="bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition">
+                        I Understand
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Banner (Replaces alert()) -->
+    <div id="toast-notification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 bg-navy-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center gap-2.5 text-sm font-medium max-w-sm">
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-teal-400 shrink-0"></i>
+        <span id="toast-message">Notification</span>
+    </div>
+
+    <!-- Application Data & Interactive Logic -->
+    <script>
+        // Comprehensive Realistic Undergraduate Dataset
+        const universities = [
+            {
+                id: 'tum',
+                name: 'Technical University of Munich (TUM)',
+                city: 'Munich',
+                country: 'Germany',
+                flag: '🇩🇪',
+                type: 'Public Research University',
+                tuitionAnnualUSD: 4300,
+                tuitionDisplay: '$4,300 / yr',
+                tuitionNote: 'Non-EU/EEA international undergrad tuition introduced (~€2,000–€3,000/sem) + ~$180/yr student union fee.',
+                semesterAdminFee: '~$90 / semester (Student Union & basic transit)',
+                monthlyLivingUSD: 1350,
+                fundingLevel: 'Low-Tuition',
+                fundingBadge: 'Low Statutory Tuition + External Grants',
+                disciplines: ['Engineering & Tech', 'Natural Sciences', 'Business & Economics'],
+                degreeDuration: '3 Years (6 Semesters)',
+                primaryLanguage: 'German (Select BSc tracks in English)',
+                degrees: [
+                    { name: 'B.Sc. Aerospace', duration: '3 Years', language: 'English', entry: 'Abitur equivalent + Aptitude Assessment (EFV) + English B2/C1' },
+                    { name: 'B.Sc. Management and Technology (TUM-BWL)', duration: '3 Years', language: 'English / German', entry: 'High school diploma, math proficiency & two-stage aptitude review' },
+                    { name: 'B.Sc. Informatics (Computer Science)', duration: '3 Years', language: 'German (C1)', entry: 'Direct university entrance qualification + German C1 certificate' },
+                    { name: 'B.Sc. Information Engineering (Heilbronn)', duration: '3 Years', language: 'English', entry: 'Strong STEM grades + English proficiency proof' }
+                ],
+                scholarships: [
+                    { name: 'TUM Tuition Fee Waiver (Need/Merit)', amount: 'Up to 100% of tuition fees', type: 'Need & Merit-Based', details: 'Available to low-income non-EU students or top academic performers.' },
+                    { name: 'Deutschlandstipendium', amount: '~$325 / month (€300)', type: 'Merit-Based', details: 'Co-funded by federal government and private sponsors; open to all nationalities.' },
+                    { name: 'DAAD Prize for International Students', amount: '~$1,080 (One-time)', type: 'Merit & Engagement', details: 'Awarded annually to enrolled international students showing academic excellence.' }
+                ],
+                accommodation: {
+                    onCampusMonthly: '$380 – $550 / mo',
+                    privateMonthly: '$850 – $1,300 / mo',
+                    guaranteePolicy: 'No automatic guarantee; Munich Student Union (Studierendenwerk) dorm waitlists typically take 2–4 semesters.',
+                    options: [
+                        'Studierendenwerk München Halls (Single rooms & shared apartments; apply immediately upon admission)',
+                        'Private Student Residences (e.g., Campus Viva, Youniq — higher rent, furnished)',
+                        'WG (Wohngemeinschaft — shared private flat with local or international students)'
+                    ]
+                }
+            },
+            {
+                id: 'uoft',
+                name: 'University of Toronto',
+                city: 'Toronto, ON',
+                country: 'Canada',
+                flag: '🇨🇦',
+                type: 'Public Research University',
+                tuitionAnnualUSD: 44500,
+                tuitionDisplay: '$44,500 / yr',
+                tuitionNote: 'Varies significantly by faculty: Arts & Science (~$44k) vs. Applied Science & Engineering (~$49k).',
+                semesterAdminFee: '~$1,450 / year (Incidental, health UHIP & campus fees)',
+                monthlyLivingUSD: 1650,
+                fundingLevel: 'High',
+                fundingBadge: 'Major Merit Scholarships Available',
+                disciplines: ['Engineering & Tech', 'Business & Economics', 'Natural Sciences', 'Arts & Humanities'],
+                degreeDuration: '4 Years (Honours BSc/BA/BASc)',
+                primaryLanguage: 'English',
+                degrees: [
+                    { name: 'Honours B.Sc. Computer Science', duration: '4 Years', language: 'English', entry: 'Competitive high school calculus & overall GPA + supplementary profile' },
+                    { name: 'Bachelor of Commerce (Rotman Commerce)', duration: '4 Years', language: 'English', entry: 'Strong calculus/English grades + mandatory video & written supplemental app' },
+                    { name: 'B.A.Sc. Mechanical / Electrical Engineering', duration: '4 Years', language: 'English', entry: 'Physics, Chemistry, Calculus + Online Student Profile' },
+                    { name: 'Honours B.A. International Relations', duration: '4 Years', language: 'English', entry: 'Strong humanities/social science grades + English proficiency' }
+                ],
+                scholarships: [
+                    { name: 'Lester B. Pearson International Scholarship', amount: 'Full Tuition + Residence + Books (4 yrs)', type: 'Full-Ride Merit', details: 'Requires high school nomination; covers 100% of undergraduate costs for ~37 scholars annually.' },
+                    { name: 'University of Toronto Scholars Program', amount: '~$5,500 – $7,500 (CAD $7.5k–$10k)', type: 'Automatic Merit', details: 'All applicants are automatically considered based on admission average.' },
+                    { name: 'International Scholar Award (Faculty-specific)', amount: 'Up to $18,000 / yr', type: 'Merit-Based', details: 'Renewable awards offered across Arts & Science, Engineering, and Scarborough/Mississauga campuses.' }
+                ],
+                accommodation: {
+                    onCampusMonthly: '$1,100 – $1,600 / mo (incl. meal plan)',
+                    privateMonthly: '$1,050 – $1,550 / mo',
+                    guaranteePolicy: 'First-year housing guaranteed for incoming undergrads who accept offer and submit StarRez housing application before March 31.',
+                    options: [
+                        'College Residences (Trinity, Victoria, New College, Chestnut Residence — dormitory & suite styles)',
+                        'CampusOne & Parkside Student Residence (Affiliated private student housing adjacent to campus)',
+                        'Off-campus shared apartments in Downtown Toronto / Annex neighborhood'
+                    ]
+                }
+            },
+            {
+                id: 'manchester',
+                name: 'University of Manchester',
+                city: 'Manchester',
+                country: 'United Kingdom',
+                flag: '🇬🇧',
+                type: 'Public Russell Group University',
+                tuitionAnnualUSD: 34500,
+                tuitionDisplay: '$34,500 / yr',
+                tuitionNote: 'Classroom-based degrees start around ~$31,000/yr; Lab/Engineering programs reach ~$39,000/yr.',
+                semesterAdminFee: '$0 separate admin fee (Included in tuition; UK IHS visa health surcharge separate)',
+                monthlyLivingUSD: 1250,
+                fundingLevel: 'Moderate',
+                fundingBadge: 'Partial Merit & Regional Awards',
+                disciplines: ['Engineering & Tech', 'Business & Economics', 'Natural Sciences', 'Arts & Humanities'],
+                degreeDuration: '3 Years (4 Years w/ Industrial Placement)',
+                primaryLanguage: 'English',
+                degrees: [
+                    { name: 'B.Sc. (Hons) Economics & Finance', duration: '3 Years', language: 'English', entry: 'A-Level AAB / IB 35 points (with strong Mathematics) via UCAS' },
+                    { name: 'B.Eng. (Hons) Aerospace / Chemical Engineering', duration: '3 Years', language: 'English', entry: 'A-Level AAA / IB 36 points including Maths & Physics/Chemistry' },
+                    { name: 'B.Sc. (Hons) Computer Science', duration: '3 Years', language: 'English', entry: 'A-Level A*AA / IB 37 points with strong Mathematics' },
+                    { name: 'B.A. (Hons) Politics and Modern History', duration: '3 Years', language: 'English', entry: 'A-Level ABB / IB 34 points + personal statement' }
+                ],
+                scholarships: [
+                    { name: 'Global Futures Scholarship', amount: '~$10,000 / yr (£8,000)', type: 'Merit-Based', details: 'Competitive awards for international undergrads from select regions across South Asia, Africa, and Middle East.' },
+                    { name: 'Faculty of Science & Engineering International Excellence', amount: '~$3,800 – $6,300 / yr', type: 'Merit-Based', details: 'Awarded to high-achieving international offer holders in STEM disciplines.' },
+                    { name: 'Manchester Bursary / Hardship Funds', amount: 'Variable emergency support', type: 'Need-Based (Enrolled)', details: 'Limited emergency grants once enrolled; primary tuition funding must be secured prior to arrival.' }
+                ],
+                accommodation: {
+                    onCampusMonthly: '$680 – $980 / mo',
+                    privateMonthly: '$750 – $1,100 / mo',
+                    guaranteePolicy: 'Guaranteed university-managed accommodation for unaccompanied first-year international undergraduates applying by August 31.',
+                    options: [
+                        'Fallowfield Campus Halls (Owens Park, Oak House — lively social hub for first-years)',
+                        'City & Victoria Park Halls (Whitworth Park, Hulme Hall — walking distance to lectures)',
+                        'Private Purpose-Built Student Accommodation (Unite Students, iQ Student)'
+                    ]
+                }
+            },
+            {
+                id: 'uva',
+                name: 'University of Amsterdam (UvA)',
+                city: 'Amsterdam',
+                country: 'Netherlands',
+                flag: '🇳🇱',
+                type: 'Public Research University',
+                tuitionAnnualUSD: 13200,
+                tuitionDisplay: '$13,200 / yr',
+                tuitionNote: 'Non-EU/EEA statutory institutional fee (~€10,500–€14,500 depending on faculty). EU/EEA citizens pay ~$2,800/yr.',
+                semesterAdminFee: '$0 separate admin fee (Books & study association fees ~$400/yr)',
+                monthlyLivingUSD: 1450,
+                fundingLevel: 'Moderate',
+                fundingBadge: 'Amsterdam Merit & NL Scholarships',
+                disciplines: ['Business & Economics', 'Arts & Humanities', 'Natural Sciences'],
+                degreeDuration: '3 Years (180 ECTS)',
+                primaryLanguage: 'English (20+ English-taught BSc/BA tracks)',
+                degrees: [
+                    { name: 'B.Sc. Economics and Business Economics', duration: '3 Years', language: 'English', entry: 'VWO equivalent diploma + Mathematics proficiency & selection test' },
+                    { name: 'B.Sc. Communication Science', duration: '3 Years', language: 'English', entry: 'High school diploma equivalent to Dutch VWO + mandatory matching' },
+                    { name: 'B.Sc. Psychology (Numerus Fixus)', duration: '3 Years', language: 'English', entry: 'Competitive decentralized selection exam (deadline Jan 15)' },
+                    { name: 'B.A. Media and Information', duration: '3 Years', language: 'English', entry: 'VWO equivalent diploma + English IELTS 6.5 / TOEFL 92' }
+                ],
+                scholarships: [
+                    { name: 'Amsterdam Merit Scholarship (AMS)', amount: '~$6,500 – $13,000 / yr', type: 'Merit-Based', details: 'Highly selective; awarded to top non-EU/EEA students in Economics, Business, and Social Sciences.' },
+                    { name: 'NL Scholarship (formerly Holland Scholarship)', amount: '~$5,400 (First year only)', type: 'Government / Univ. Grant', details: 'Financed by Dutch Ministry of Education for incoming non-EEA bachelor students.' }
+                ],
+                accommodation: {
+                    onCampusMonthly: '$600 – $950 / mo (via UvA lottery)',
+                    privateMonthly: '$950 – $1,450 / mo',
+                    guaranteePolicy: 'NO guarantee. Amsterdam faces an acute student housing shortage; UvA allocates limited rooms via lottery for first-years only.',
+                    options: [
+                        'UvA International Student Housing (Allocated via DUWO / De Key for 1 year max; lottery-based)',
+                        'Private Student Complexes (The Social Hub, Student Experience — book 6+ months ahead)',
+                        'Commuter Towns (Living in Haarlem, Zaandam, or Utrecht with 15–25 min train commute)'
+                    ]
+                }
+            },
+            {
+                id: 'melbourne',
+                name: 'University of Melbourne',
+                city: 'Melbourne, VIC',
+                country: 'Australia',
+                flag: '🇦🇺',
+                type: 'Public Group of Eight University',
+                tuitionAnnualUSD: 33500,
+                tuitionDisplay: '$33,500 / yr',
+                tuitionNote: 'Arts/Design ~$29,000/yr; Commerce ~$34,000/yr; Science/Biomedicine ~$36,500/yr.',
+                semesterAdminFee: '~$240 / year (Student Services & Amenities Fee + OSHC health cover ~$480/yr)',
+                monthlyLivingUSD: 1400,
+                fundingLevel: 'High',
+                fundingBadge: 'Up to 100% Fee Remission Awards',
+                disciplines: ['Business & Economics', 'Natural Sciences', 'Engineering & Tech', 'Arts & Humanities'],
+                degreeDuration: '3 Years (Melbourne Model)',
+                primaryLanguage: 'English',
+                degrees: [
+                    { name: 'Bachelor of Commerce', duration: '3 Years', language: 'English', entry: 'ATAR / IB / A-Levels + Mathematics prerequisite + English test' },
+                    { name: 'Bachelor of Science (Computing / Data / Bio)', duration: '3 Years', language: 'English', entry: 'Strong Mathematics & one laboratory science subject' },
+                    { name: 'Bachelor of Design (Architecture / UX)', duration: '3 Years', language: 'English', entry: 'Academic prerequisite + optional creative portfolio for select majors' },
+                    { name: 'Bachelor of Biomedicine', duration: '3 Years', language: 'English', entry: 'High academic cutoff + Chemistry, Mathematics & English' }
+                ],
+                scholarships: [
+                    { name: 'Melbourne International Undergraduate Scholarship', amount: '$10,000 AUD (Yr 1) or 50%–100% Fee Remission', type: 'Automatic Merit', details: 'No separate application required; assessed automatically based on final high school results.' },
+                    { name: 'Hansen Scholarship (Select International Tracks)', amount: 'Accommodation + Stipend + Fee Support', type: 'Merit & Financial Need', details: 'Comprehensive leadership and academic excellence award.' }
+                ],
+                accommodation: {
+                    onCampusMonthly: '$1,100 – $1,650 / mo (Residential Colleges)',
+                    privateMonthly: '$850 – $1,250 / mo',
+                    guaranteePolicy: 'Accommodation guarantee available for first-year international undergraduates who apply to University-managed housing by deadline.',
+                    options: [
+                        'University Accommodation (Little Hall, Lisa Bellear House — modern apartments with academic support)',
+                        'Traditional Residential Colleges (Ormond, Trinity, Queen’s — includes meals & tutorials)',
+                        'Private Student Apartments in Carlton / CBD (Scape, UniLodge)'
+                    ]
+                }
+            },
+            {
+                id: 'ubc',
+                name: 'University of British Columbia (UBC)',
+                city: 'Vancouver, BC',
+                country: 'Canada',
+                flag: '🇨🇦',
+                type: 'Public Research University',
+                tuitionAnnualUSD: 35800,
+                tuitionDisplay: '$35,800 / yr',
+                tuitionNote: 'Vancouver campus international undergrad tuition ranges ~$34,500 (Arts) to ~$44,000 (Engineering/Sauder Business).',
+                semesterAdminFee: '~$1,150 / year (U-Pass transit, athletics, health & dental)',
+                monthlyLivingUSD: 1550,
+                fundingLevel: 'High',
+                fundingBadge: 'Need & Merit International Awards',
+                disciplines: ['Engineering & Tech', 'Business & Economics', 'Natural Sciences', 'Arts & Humanities'],
+                degreeDuration: '4 Years',
+                primaryLanguage: 'English',
+                degrees: [
+                    { name: 'Bachelor of Commerce (UBC Sauder)', duration: '4 Years', language: 'English', entry: 'Strong academics + Personal Profile + mandatory video interview' },
+                    { name: 'B.A.Sc. Engineering (Vancouver / Okanagan)', duration: '4 Years', language: 'English', entry: 'Senior-level Math, Physics, Chemistry + Personal Profile' },
+                    { name: 'B.Sc. Computer Science / Data Science', duration: '4 Years', language: 'English', entry: 'Admitted to general B.Sc. first; competitive specialization after Year 1' },
+                    { name: 'B.A. International Economics', duration: '4 Years', language: 'English', entry: 'Strong quantitative/calculus background + Personal Profile' }
+                ],
+                scholarships: [
+                    { name: 'Karen McKellin International Leader of Tomorrow', amount: 'Up to Full Tuition + Living (Need-Based)', type: 'Need & Merit-Based', details: 'Requires school nomination; covers demonstrated financial need for all 4 years.' },
+                    { name: 'International Major Entrance Scholarship (IMES)', amount: '~$7,500 – $15,000 / yr (Renewable)', type: 'Merit-Based', details: 'Awarded to exceptional international students entering first year.' },
+                    { name: 'Outstanding International Student (OIS) Award', amount: '~$7,500 – $18,000 (One-time)', type: 'Merit-Based', details: 'Merit-based entrance scholarship awarded upon admission.' }
+                ],
+                accommodation: {
+                    onCampusMonthly: '$950 – $1,350 / mo (incl. mandatory meal plan in 1st yr)',
+                    privateMonthly: '$1,000 – $1,500 / mo',
+                    guaranteePolicy: 'First-Year Guarantee: Incoming students entering directly from high school who apply by May 1 are guaranteed a spot.',
+                    options: [
+                        'First-Year Dormitories (Place Vanier, Totem Park, Orchard Commons — single/shared rooms)',
+                        'Upper-Year Studio & Shared Suites (Walter Gage, Ponderosa Commons)',
+                        'Off-campus shared houses in Kitsilano / Point Grey'
+                    ]
+                }
+            },
+            {
+                id: 'tudelft',
+                name: 'Delft University of Technology (TU Delft)',
+                city: 'Delft',
+                country: 'Netherlands',
+                flag: '🇳🇱',
+                type: 'Public Technical University',
+                tuitionAnnualUSD: 17800,
+                tuitionDisplay: '$17,800 / yr',
+                tuitionNote: 'Non-EU/EEA BSc tuition is ~€16,400/yr. EU/EEA citizens pay the statutory Dutch rate of ~$2,800/yr.',
+                semesterAdminFee: '$0 separate admin fee (Lab kits/software ~$300/yr)',
+                monthlyLivingUSD: 1200,
+                fundingLevel: 'Low-Tuition',
+                fundingBadge: 'NL Scholarship + External Grants',
+                disciplines: ['Engineering & Tech', 'Natural Sciences'],
+                degreeDuration: '3 Years (180 ECTS)',
+                primaryLanguage: 'English (Select BSc programs)',
+                degrees: [
+                    { name: 'B.Sc. Aerospace Engineering (Numerus Fixus)', duration: '3 Years', language: 'English', entry: 'Strict selection procedure (deadl
